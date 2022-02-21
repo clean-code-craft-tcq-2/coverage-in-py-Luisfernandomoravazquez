@@ -1,36 +1,3 @@
-
-def infer_breach(value, lowerLimit, upperLimit):
-  if value < lowerLimit:
-    return 'TOO_LOW'
-  if value > upperLimit:
-    return 'TOO_HIGH'
-  return 'NORMAL'
-
-
-def classify_temperature_breach(coolingType, temperatureInC):
-  lowerLimit = 0
-  upperLimit = 0
-  if coolingType == 'PASSIVE_COOLING':
-    lowerLimit = 0
-    upperLimit = 35
-  elif coolingType == 'HI_ACTIVE_COOLING':
-    lowerLimit = 0
-    upperLimit = 45
-  elif coolingType == 'MED_ACTIVE_COOLING':
-    lowerLimit = 0
-    upperLimit = 40
-  return infer_breach(temperatureInC, lowerLimit, upperLimit)
-
-
-def check_and_alert(alertTarget, batteryChar, temperatureInC):
-  breachType =\
-    classify_temperature_breach(batteryChar['coolingType'], temperatureInC)
-  if alertTarget == 'TO_CONTROLLER':
-    send_to_controller(breachType)
-  elif alertTarget == 'TO_EMAIL':
-    send_to_email(breachType)
-
-
 def send_to_controller(breachType):
   header = 0xfeed
   print(f'{header}, {breachType}')
@@ -44,3 +11,36 @@ def send_to_email(breachType):
   elif breachType == 'TOO_HIGH':
     print(f'To: {recepient}')
     print('Hi, the temperature is too high')
+
+class coolingType:
+  def __init__(self,lowerLimit, upperLimit, alerterMethod):
+    self.lowerLimit = lowerLimit
+    self.upperLimit = upperLimit
+    self.alerterMethod = alerterMethod
+  
+  def check_and_alert(self, value):
+    if( self.Is_Lower_Limit_Breached(value) ):
+      self.alerterMethod("TOO_LOW")
+      return("TOO_LOW")
+    elif( self.Is_Upper_Limit_Breached(value) ):
+      self.alerterMethod("TOO_HIGH")
+      return("TOO_HIGH")
+    else:
+      return("NORMAL")
+
+  def Is_Lower_Limit_Breached(self,value):
+    return value < self.lowerLimit
+  def Is_Upper_Limit_Breached(self,value):
+    return value > self.upperLimit
+
+coolingTypes_dict = {
+  "PASSIVE" : coolingType(lowerLimit=0,upperLimit=35,alerterMethod=send_to_email),
+  "HI_ACTIVE" : coolingType(lowerLimit=0,upperLimit=45,alerterMethod=send_to_controller),
+  "MED_ACTIVE" : coolingType(lowerLimit=0,upperLimit=40,alerterMethod=send_to_email),
+}
+def check_temperature(value, coolingType):
+  if(coolingType in coolingTypes_dict):
+    coolingAnalyzer = coolingTypes_dict[coolingType]
+    return coolingAnalyzer.check_and_alert(value)
+  else:
+    return "INVALID_COOLING_TYPE"
