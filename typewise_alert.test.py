@@ -28,6 +28,13 @@ class TypewiseTest(unittest.TestCase):
     self.assertTrue(testCoolingType.check_and_alert(-10) == "TOO_LOW")
     self.assertTrue(testCoolingType.check_and_alert(20) == "NORMAL")
     self.assertTrue(testCoolingType.check_and_alert(200000) == "TOO_HIGH")
+
+  def test_send_functions(self): # no return required
+    self.assertTrue(typewise_alert.send_to_email("TOO_LOW") is None)
+    self.assertTrue(typewise_alert.send_to_email("NORMAL") is None)
+    self.assertTrue(typewise_alert.send_to_email("TOO_HIGH") is None)
+
+    self.assertTrue(typewise_alert.send_to_controller("TOO_HIGH") is None)
     
 if __name__ == '__main__':
   unittest.main()
