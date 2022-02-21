@@ -38,6 +38,9 @@ coolingTypes_dict = {
   "HI_ACTIVE" : coolingType(lowerLimit=0,upperLimit=45,alerterMethod=send_to_controller),
   "MED_ACTIVE" : coolingType(lowerLimit=0,upperLimit=40,alerterMethod=send_to_email),
 }
-def inputFunction(value, coolingType):
-  coolingAnalyzer = coolingTypes_dict[coolingType]
-  return coolingAnalyzer.check_and_alert(value)
+def check_temperature(value, coolingType):
+  if(coolingType in coolingTypes_dict):
+    coolingAnalyzer = coolingTypes_dict[coolingType]
+    return coolingAnalyzer.check_and_alert(value)
+  else:
+    return "INVALID_COOLING_TYPE"
